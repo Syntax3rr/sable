@@ -169,7 +169,16 @@ public abstract class ServerPlayerMixin implements ServerPlayerRespawnExtension 
                 return Optional.empty();
             }
 
-            // TODO: do validation here
+            // Skip validation when the sublevel is unloaded
+            final boolean shouldValidate = point.subLevelId() == null || Sable.HELPER.getContaining(level, blockPos) != null;
+
+            if (shouldValidate && findRespawnAndUseSpawnBlock(level, blockPos, f1, b1, b2).isEmpty()) {
+                data.removeTrackingPoint(this.sable$respawnPoint);
+                this.sable$respawnPoint = null;
+                return Optional.empty();
+            }
+
+            // TODO: validation for unloaded sublevels
 
             if (point.subLevelId() != null) {
                 this.sable$queuedFreeze = Pair.of(point.subLevelId(), point.localAnchor());
